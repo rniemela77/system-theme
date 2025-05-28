@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import './App.css'
 import Window from './components/Window'
-import BottomBar from './components/BottomBar'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -14,7 +13,6 @@ function App() {
       padding: '20px'
     }}>
       <Window />
-      <BottomBar />
     </div>
   )
 }
