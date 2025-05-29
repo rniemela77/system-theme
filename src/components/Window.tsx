@@ -1,37 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { MouseEvent } from 'react';
 import { DrawingCanvas } from './DrawingCanvas';
 import { TextEditor } from './TextEditor';
 import type { File } from '../types/file';
+import { loadFiles, saveFiles } from '../utils/storage';
 
 const Window: React.FC = () => {
   const [position, setPosition] = useState({ x: 20, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [files, setFiles] = useState<File[]>([
-    { 
-      name: 'example.txt',
-      content: 'This is an example file.',
-      type: 'text'
-    },
-    { 
-      name: 'todo.txt',
-      content: '1. Create file system\n2. Add more features',
-      type: 'text'
-    },
-    { 
-      name: 'drawing1.png', 
-      content: '', 
-      type: 'drawing'
-    },
-    { 
-      name: 'drawing2.png', 
-      content: '',
-      type: 'drawing'
-    }
-  ]);
+  const [files, setFiles] = useState<File[]>(() => loadFiles());
   const [selectedFileName, setSelectedFileName] = useState(files[0].name);
   const selectedFile = files.find(f => f.name === selectedFileName)!;
+
+  // Save files to localStorage whenever they change
+  useEffect(() => {
+    saveFiles(files);
+  }, [files]);
 
   const updateFileContent = (newContent: string) => {
     setFiles(prevFiles => 
