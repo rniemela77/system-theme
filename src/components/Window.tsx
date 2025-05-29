@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { MouseEvent } from 'react';
 import { DrawingCanvas } from './DrawingCanvas';
 import { TextEditor } from './TextEditor';
+import { FileIcon } from './FileIcon';
 import type { File } from '../types/file';
 import { loadFiles, saveFiles } from '../utils/storage';
 
@@ -106,10 +107,13 @@ const Window: React.FC = () => {
                   backgroundColor: file.name === selectedFileName ? '#e3f2fd' : 'transparent',
                   borderRadius: '4px',
                   marginBottom: '0.25rem',
-                  fontSize: '0.9rem'
+                  fontSize: '0.9rem',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
                 onClick={() => setSelectedFileName(file.name)}
               >
+                <FileIcon type={file.type} />
                 {file.name}
               </div>
             ))}
