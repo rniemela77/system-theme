@@ -12,6 +12,7 @@ const Window: React.FC = () => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [files, setFiles] = useState<File[]>(() => loadFiles());
   const [selectedFileName, setSelectedFileName] = useState(files[0].name);
+  const [draggedFile, setDraggedFile] = useState<string | null>(null);
   const selectedFile = files.find(f => f.name === selectedFileName)!;
 
   // Save files to localStorage whenever they change
@@ -25,6 +26,45 @@ const Window: React.FC = () => {
         f.name === selectedFileName ? { ...f, content: newContent } : f
       )
     );
+  };
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, fileName: string) => {
+    setDraggedFile(fileName);
+    e.dataTransfer.effectAllowed = 'move';
+    // Add some transparency to the dragged element
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '0.5';
+    }
+  };
+
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    setDraggedFile(null);
+    // Restore opacity
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '1';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetFileName: string) => {
+    e.preventDefault();
+    if (!draggedFile || draggedFile === targetFileName) return;
+
+    setFiles(prevFiles => {
+      const newFiles = [...prevFiles];
+      const draggedIndex = newFiles.findIndex(f => f.name === draggedFile);
+      const targetIndex = newFiles.findIndex(f => f.name === targetFileName);
+      
+      // Remove the dragged item and insert it at the new position
+      const [draggedItem] = newFiles.splice(draggedIndex, 1);
+      newFiles.splice(targetIndex, 0, draggedItem);
+      
+      return newFiles;
+    });
   };
 
   const handleWindowMouseDown = (e: MouseEvent) => {
@@ -101,15 +141,26 @@ const Window: React.FC = () => {
             {files.map(file => (
               <div
                 key={file.name}
+                draggable
+                onDragStart={(e) => handleDragStart(e, file.name)}
+                onDragEnd={handleDragEnd}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, file.name)}
                 style={{
                   padding: '0.5rem 0.75rem',
-                  cursor: 'pointer',
+                  cursor: 'grab',
                   backgroundColor: file.name === selectedFileName ? '#e3f2fd' : 'transparent',
                   borderRadius: '4px',
                   marginBottom: '0.25rem',
                   fontSize: '0.9rem',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  userSelect: 'none',
+                  transition: 'transform 0.1s ease',
+                  ...(draggedFile && draggedFile !== file.name ? {
+                    transform: 'scale(1.02)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  } : {})
                 }}
                 onClick={() => setSelectedFileName(file.name)}
               >
