@@ -151,7 +151,6 @@ const Window: React.FC = () => {
                   cursor: 'grab',
                   backgroundColor: file.name === selectedFileName ? '#e3f2fd' : 'transparent',
                   borderRadius: '4px',
-                  marginBottom: '0.25rem',
                   fontSize: '0.9rem',
                   display: 'flex',
                   alignItems: 'center',
