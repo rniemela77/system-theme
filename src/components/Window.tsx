@@ -1,22 +1,47 @@
 import React, { useState } from 'react';
 import type { MouseEvent } from 'react';
-
-interface File {
-  name: string;
-  content: string;
-}
+import { DrawingCanvas } from './DrawingCanvas';
+import { TextEditor } from './TextEditor';
+import type { File } from '../types/file';
 
 const Window: React.FC = () => {
   const [position, setPosition] = useState({ x: 20, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [files] = useState<File[]>([
-    { name: 'example.txt', content: 'This is an example file.' },
-    { name: 'todo.txt', content: '1. Create file system\n2. Add more features' }
+  const [files, setFiles] = useState<File[]>([
+    { 
+      name: 'example.txt',
+      content: 'This is an example file.',
+      type: 'text'
+    },
+    { 
+      name: 'todo.txt',
+      content: '1. Create file system\n2. Add more features',
+      type: 'text'
+    },
+    { 
+      name: 'drawing1.png', 
+      content: '', 
+      type: 'drawing'
+    },
+    { 
+      name: 'drawing2.png', 
+      content: '',
+      type: 'drawing'
+    }
   ]);
-  const [selectedFile, setSelectedFile] = useState<File>(files[0]);
+  const [selectedFileName, setSelectedFileName] = useState(files[0].name);
+  const selectedFile = files.find(f => f.name === selectedFileName)!;
 
-  const handleMouseDown = (e: MouseEvent) => {
+  const updateFileContent = (newContent: string) => {
+    setFiles(prevFiles => 
+      prevFiles.map(f => 
+        f.name === selectedFileName ? { ...f, content: newContent } : f
+      )
+    );
+  };
+
+  const handleWindowMouseDown = (e: MouseEvent) => {
     setIsDragging(true);
     setDragOffset({
       x: e.clientX - position.x,
@@ -24,7 +49,7 @@ const Window: React.FC = () => {
     });
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleWindowMouseMove = (e: MouseEvent) => {
     if (isDragging) {
       setPosition({
         x: e.clientX - dragOffset.x,
@@ -33,7 +58,7 @@ const Window: React.FC = () => {
     }
   };
 
-  const handleMouseUp = () => {
+  const handleWindowMouseUp = () => {
     setIsDragging(false);
   };
 
@@ -53,9 +78,9 @@ const Window: React.FC = () => {
         flexDirection: 'column',
         overflow: 'hidden'
       }}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onMouseMove={handleWindowMouseMove}
+      onMouseUp={handleWindowMouseUp}
+      onMouseLeave={handleWindowMouseUp}
     >
       <div
         style={{
@@ -70,9 +95,9 @@ const Window: React.FC = () => {
           color: 'white',
           userSelect: 'none'
         }}
-        onMouseDown={handleMouseDown}
+        onMouseDown={handleWindowMouseDown}
       >
-        File Editor
+        {selectedFile.type === 'drawing' ? 'Drawing Editor' : 'Text Editor'}
       </div>
       <div style={{ 
         display: 'flex',
@@ -93,12 +118,12 @@ const Window: React.FC = () => {
                 style={{
                   padding: '0.5rem 0.75rem',
                   cursor: 'pointer',
-                  backgroundColor: file === selectedFile ? '#e3f2fd' : 'transparent',
+                  backgroundColor: file.name === selectedFileName ? '#e3f2fd' : 'transparent',
                   borderRadius: '4px',
                   marginBottom: '0.25rem',
                   fontSize: '0.9rem'
                 }}
-                onClick={() => setSelectedFile(file)}
+                onClick={() => setSelectedFileName(file.name)}
               >
                 {file.name}
               </div>
@@ -109,29 +134,23 @@ const Window: React.FC = () => {
         {/* Content Area */}
         <div style={{
           flex: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#f5f5f5',
+          padding: '1rem'
         }}>
-          <textarea
-            value={selectedFile.content}
-            onChange={(e) => {
-              const updatedFiles = files.map(f => 
-                f === selectedFile ? { ...f, content: e.target.value } : f
-              );
-              const newSelectedFile = updatedFiles.find(f => f.name === selectedFile.name)!;
-              setSelectedFile(newSelectedFile);
-            }}
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none',
-              padding: '1rem',
-              resize: 'none',
-              fontFamily: 'monospace',
-              fontSize: '0.9rem',
-              backgroundColor: '#f0f0f0',
-              color: '#362E2E',
-              outline: 'none'
-            }}
-          />
+          {selectedFile.type === 'drawing' ? (
+            <DrawingCanvas
+              content={selectedFile.content}
+              onContentChange={updateFileContent}
+            />
+          ) : (
+            <TextEditor
+              content={selectedFile.content}
+              onContentChange={updateFileContent}
+            />
+          )}
         </div>
       </div>
     </div>
