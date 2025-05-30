@@ -51,7 +51,6 @@ const Window: React.FC = () => {
   return (
     <div 
       style={{
-        backgroundColor: '#f0f0f0',
         border: '1px solid #ccc',
         borderRadius: '4px',
         position: 'absolute',
@@ -75,7 +74,8 @@ const Window: React.FC = () => {
       <div style={{ 
         display: 'flex',
         flex: 1,
-        backgroundColor: '#fff'
+        backgroundColor: '#FFFFFF99',
+        backdropFilter: 'blur(20px)',
       }}>
         <Sidebar
           files={files}

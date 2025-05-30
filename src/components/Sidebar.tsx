@@ -70,7 +70,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             style={{
               padding: '0.5rem 0.75rem',
               cursor: 'grab',
-              backgroundColor: file.name === selectedFileName ? '#e3f2fd' : 'transparent',
+              backgroundColor: file.name === selectedFileName ? '#FFFFFF' : 'transparent',
               borderRadius: '4px',
               fontSize: '0.9rem',
               display: 'flex',

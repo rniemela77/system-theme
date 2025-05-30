@@ -10,16 +10,19 @@ export const TitleBar: React.FC<TitleBarProps> = ({ title, onMouseDown }) => {
   return (
     <div
       style={{
-        backgroundColor: '#2980b9',
+        background: 'linear-gradient(50deg, #55A2FF, #39B0FF)',
+        backdropFilter: 'blur(20px)',
         height: '2rem',
         borderTopLeftRadius: '4px',
         borderTopRightRadius: '4px',
         cursor: 'move',
         display: 'flex',
         alignItems: 'center',
-        padding: '0 1rem',
+        padding: '1.5rem 2rem',
         color: 'white',
-        userSelect: 'none'
+        fontSize: '1.1rem',
+        userSelect: 'none',
+        fontWeight: 'bold',
       }}
       onMouseDown={onMouseDown}
     >

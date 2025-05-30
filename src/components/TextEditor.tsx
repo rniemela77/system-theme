@@ -18,7 +18,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({ content, onContentChange
         resize: 'none',
         fontFamily: 'monospace',
         fontSize: '0.9rem',
-        backgroundColor: '#f0f0f0',
+        backgroundColor: 'rgba(255, 255, 255, 0)',
         color: '#362E2E',
         outline: 'none'
       }}

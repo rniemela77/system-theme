@@ -86,10 +86,6 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ content, onContent
       onMouseMove={draw}
       onMouseUp={stopDrawing}
       onMouseLeave={stopDrawing}
-      style={{
-        backgroundColor: 'white',
-        boxShadow: '0 0 10px rgba(0,0,0,0.1)'
-      }}
     />
   );
 }; 
