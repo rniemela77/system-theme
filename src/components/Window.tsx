@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import type { MouseEvent } from 'react';
+import React from 'react';
 import { DrawingCanvas } from './DrawingCanvas';
 import { TextEditor } from './TextEditor';
 import { Sidebar } from './Sidebar';
 import { TitleBar } from './TitleBar';
 import type { File } from '../types/file';
 import { loadFiles, saveFiles } from '../utils/storage';
+import { useWindowManager } from '../hooks/useWindowManager';
+import { useState, useEffect } from 'react';
 
 const Window: React.FC = () => {
-  const [position, setPosition] = useState({ x: 20, y: 20 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const {
+    position,
+    size,
+    handleWindowMouseDown,
+    handleResizeMouseDown
+  } = useWindowManager();
+
   const [files, setFiles] = useState<File[]>(() => loadFiles());
   const [selectedFileName, setSelectedFileName] = useState(files[0].name);
   const selectedFile = files.find(f => f.name === selectedFileName)!;
@@ -18,27 +23,6 @@ const Window: React.FC = () => {
   useEffect(() => {
     saveFiles(files);
   }, [files]);
-
-  const handleWindowMouseDown = (e: MouseEvent) => {
-    setIsDragging(true);
-    setDragOffset({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y
-    });
-  };
-
-  const handleWindowMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
-      setPosition({
-        x: e.clientX - dragOffset.x,
-        y: e.clientY - dragOffset.y
-      });
-    }
-  };
-
-  const handleWindowMouseUp = () => {
-    setIsDragging(false);
-  };
 
   const updateFileContent = (newContent: string) => {
     setFiles(prevFiles => 
@@ -56,16 +40,13 @@ const Window: React.FC = () => {
         position: 'absolute',
         left: position.x,
         top: position.y,
-        minWidth: '600px',
-        minHeight: '400px',
+        width: size.width,
+        height: size.height,
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden'
       }}
-      onMouseMove={handleWindowMouseMove}
-      onMouseUp={handleWindowMouseUp}
-      onMouseLeave={handleWindowMouseUp}
     >
       <TitleBar 
         title={selectedFile.type === 'drawing' ? 'Drawing Editor' : 'Text Editor'}
@@ -76,6 +57,7 @@ const Window: React.FC = () => {
         flex: 1,
         backgroundColor: '#FFFFFF99',
         backdropFilter: 'blur(20px)',
+        position: 'relative'
       }}>
         <Sidebar
           files={files}
@@ -89,7 +71,8 @@ const Window: React.FC = () => {
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: '#f5f5f5',
-          padding: '1rem'
+          padding: '1rem',
+          position: 'relative'
         }}>
           {selectedFile.type === 'drawing' ? (
             <DrawingCanvas
@@ -104,6 +87,19 @@ const Window: React.FC = () => {
           )}
         </div>
       </div>
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: '15px',
+          height: '15px',
+          cursor: 'se-resize',
+          background: `linear-gradient(135deg, transparent 50%, #ccc 50%)`,
+          borderBottomRightRadius: '4px'
+        }}
+        onMouseDown={handleResizeMouseDown}
+      />
     </div>
   );
 };
