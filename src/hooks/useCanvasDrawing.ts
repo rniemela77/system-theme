@@ -16,6 +16,22 @@ export const useCanvasDrawing = ({ content, onContentChange }: UseCanvasDrawingP
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPos, setLastPos] = useState<DrawingCoordinates>({ x: 0, y: 0 });
 
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear the canvas
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Save the cleared state
+    const imageData = canvas.toDataURL('image/png');
+    onContentChange(imageData);
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -126,6 +142,7 @@ export const useCanvasDrawing = ({ content, onContentChange }: UseCanvasDrawingP
     canvasRef,
     startDrawing,
     draw,
-    stopDrawing
+    stopDrawing,
+    clearCanvas
   };
 }; 
